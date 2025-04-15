@@ -1,0 +1,4 @@
+resources
+| where type =~ 'Microsoft.MachineLearningServices/workspaces'
+| where properties.publicNetworkAccess =~ 'Enabled'
+| project name, id, kind, subscriptionId, tenantId
