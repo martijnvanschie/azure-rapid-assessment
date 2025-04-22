@@ -1,20 +1,21 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Azure.Core;
 using Azure.Identity;
 using Azure.Rapid.Assessment.Core.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Azure.Rapid.Assessment.Core
 {
     public class ResourceGraphService
     {
+        private static readonly ILogger<ResourceGraphService> _logger = HostManager.GetLogger<ResourceGraphService>();
+
         private ResourceGraphService() { }
 
         public string AppUrl { get; private set; }
         public HttpClient Client { get; private set; }
-
 
         public static async Task<ResourceGraphService> CreateAsync(AzureCliCredential tokenCredential)
         {
@@ -40,6 +41,8 @@ namespace Azure.Rapid.Assessment.Core
 
         public async Task<List<AzureResource>> PostAsync(QueryInfo query)
         {
+            _logger.LogInformation($"Executing query: {query.Title}");
+
             QueryRequest request = new QueryRequest()
             {
                 Query = query.Query,
@@ -52,8 +55,8 @@ namespace Azure.Rapid.Assessment.Core
 
             if (response.IsSuccessStatusCode == false)
             {
-                Console.WriteLine($"API call failed with status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                _logger.LogWarning($"API call failed with status code: {response.StatusCode}");
+                _logger.LogWarning(await response.Content.ReadAsStringAsync());
             }
 
             var content = await response.Content.ReadAsStringAsync();
@@ -70,26 +73,29 @@ namespace Azure.Rapid.Assessment.Core
 
             if (queryResponse is null)
             {
-                Console.WriteLine("Failed to deserialize the response.");
+                _logger.LogWarning("Failed to deserialize the response.");
                 return new List<AzureResource>();
             }
-                
-            Console.WriteLine($"Total Records: {queryResponse.TotalRecords}");
-            Console.WriteLine($"Count: {queryResponse.Count}");
+
+            _logger.LogInformation($"Total Records: {queryResponse.TotalRecords}");
+            _logger.LogInformation($"Count: {queryResponse.Count}");
 
             return queryResponse.Data;
         }
 
         static void PrintResponse(string content)
         {
-            // Deserialize the JSON content into a JsonDocument
-            using var jsonDocument = JsonDocument.Parse(content);
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                // Deserialize the JSON content into a JsonDocument
+                using var jsonDocument = JsonDocument.Parse(content);
 
-            // Serialize it back with indentation for pretty printing
-            var prettyJson = JsonSerializer.Serialize(jsonDocument, new JsonSerializerOptions { WriteIndented = true });
+                // Serialize it back with indentation for pretty printing
+                var prettyJson = JsonSerializer.Serialize(jsonDocument, new JsonSerializerOptions { WriteIndented = true });
 
-            Console.WriteLine("API Response:");
-            Console.WriteLine(prettyJson);
+                _logger.LogTrace("API Response:");
+                _logger.LogTrace(prettyJson);
+            }
         }
     }
 }

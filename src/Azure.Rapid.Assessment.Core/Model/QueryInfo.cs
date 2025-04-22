@@ -13,6 +13,9 @@ namespace Azure.Rapid.Assessment.Core.Model
         [JsonPropertyName("description")]
         public string Description { get; set; }
 
+        [JsonPropertyName("definition")]
+        public string Definition { get; set; }
+
         [JsonPropertyName("query")]
         public string Query { get; set; }
 

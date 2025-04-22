@@ -10,6 +10,8 @@ namespace Azure.Rapid.Assessment.Core.Model
         public string Id { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; }
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
         [JsonPropertyName("kind")]
         public string Kind { get; set; }
         [JsonPropertyName("subscriptionId")]

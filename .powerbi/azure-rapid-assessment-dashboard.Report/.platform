@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "azure-rapid-assessment-dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4ad747d4-5511-4b36-aac3-a012e9323dc5"
+  }
+}

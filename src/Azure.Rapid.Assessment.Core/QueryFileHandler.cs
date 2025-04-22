@@ -1,4 +1,6 @@
 ﻿using Azure.Rapid.Assessment.Core.Model;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Abstractions;
 using Parquet.Meta;
 using System.Text.Json;
 
@@ -6,6 +8,7 @@ namespace Azure.Rapid.Assessment.Core
 {
     public class QueryFileHandler
     {
+        private static readonly ILogger<QueryFileHandler> _logger = HostManager.GetLogger<QueryFileHandler>();
         const string FILE_EXTENTION = ".query";
         static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -20,7 +23,7 @@ namespace Azure.Rapid.Assessment.Core
             // Check if folder exists
             if (!directory.Exists)
             {
-                Console.WriteLine($"The query folder '{directory.FullName}' does not exist.");
+                _logger.LogWarning($"The query folder '{directory.FullName}' does not exist.");
                 return queryFiles;
             }
 
@@ -30,7 +33,7 @@ namespace Azure.Rapid.Assessment.Core
             // Check if there are any files in the query folder
             if (files.Length == 0)
             {
-                Console.WriteLine($"The query folder '{directory.FullName}' does not contain any .query files.");
+                _logger.LogWarning($"The query folder '{directory.FullName}' does not contain any .query files.");
                 return queryFiles;
             }
 
@@ -59,13 +62,11 @@ namespace Azure.Rapid.Assessment.Core
 
         public static async Task WriteFileAsync(QueryInfo data, DirectoryInfo directory)
         {
-            // Check if the directory exists
             if (!directory.Exists)
             {
                 directory.Create();
             }
 
-            // Formet the file name from the directory and the title of the data
             string fileName = Path.Combine(directory.FullName, $"{data.Title}.{FILE_EXTENTION}");
 
             using (Stream fileStream = File.Open(fileName, FileMode.Create))

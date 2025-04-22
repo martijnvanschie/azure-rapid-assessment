@@ -2,6 +2,7 @@
   "id": "a0e561c4-97d6-4b3b-8b4c-f81bd1078dc5",
   "title": "all public cognitive services.query",
   "description": "all public cognitive services.query",
-  "query": "resources\r\n| where type =~ \u0027Microsoft.CognitiveServices/accounts\u0027\r\n| where properties.publicNetworkAccess =~ \u0027Enabled\u0027\r\n| project name, id, kind, subscriptionId, tenantId",
+  "definition": "Public access should be disabled for Cognitive services",
+  "query": "resources\r\n| where type =~ \u0027Microsoft.CognitiveServices/accounts\u0027\r\n| where properties.publicNetworkAccess =~ \u0027Enabled\u0027\r\n| project name, id, type, kind, subscriptionId, tenantId",
   "category": "Security"
 }

@@ -1,0 +1,63 @@
+table test
+	lineageTag: bc58ed6a-60d3-4725-aa03-5701c10a8f28
+
+	column id
+		dataType: string
+		lineageTag: 4dbdc05e-d50d-4726-b5de-c628a95b38d1
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: ab5bcddb-53f5-4b86-b823-0d16da3aefb2
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column kind
+		dataType: string
+		lineageTag: 77bcb042-391c-422e-9d60-115414be7d86
+		summarizeBy: none
+		sourceColumn: kind
+
+		annotation SummarizationSetBy = Automatic
+
+	column subscriptionId
+		dataType: string
+		lineageTag: 515cc746-5378-4299-a6bb-60b29401cc81
+		summarizeBy: none
+		sourceColumn: subscriptionId
+
+		annotation SummarizationSetBy = Automatic
+
+	column tenantId
+		dataType: string
+		lineageTag: 8d5e25cd-ba4d-4422-9ba5-7737ba14779a
+		summarizeBy: none
+		sourceColumn: tenantId
+
+		annotation SummarizationSetBy = Automatic
+
+	column type
+		dataType: string
+		lineageTag: ec631298-5383-4a22-afdf-d42a5fb1e464
+		summarizeBy: none
+		sourceColumn: type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition test = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/Repositories/GitHub/martijnvanschie/azure-rapid-assessment/src/Azure.Rapid.Assessment.CommandLine/bin/Debug/net8.0/test.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
