@@ -13,6 +13,7 @@ namespace Azure.Rapid.Assessment.Core.Model
         public int Count { get; set; }
 
         [JsonPropertyName("data")]
-        public List<dynamic> Data { get; set; }
+        public List<AzureResource> Data { get; set; }
     }
 }
+

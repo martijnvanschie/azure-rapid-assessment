@@ -38,46 +38,46 @@ namespace Azure.Rapid.Assessment.Core
             AppUrl = "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2024-04-01";
         }
 
-        public async Task PostAsync(QueryRequest query)
+        public async Task<List<AzureResource>> PostAsync(QueryInfo query)
         {
+            QueryRequest request = new QueryRequest()
+            {
+                Query = query.Query,
+            };
+
             // Serialize the query to JSON
-            var queryJson = JsonSerializer.Serialize(query);
+            var queryJson = JsonSerializer.Serialize(request);
 
             var response = await Client.PostAsync(AppUrl, new StringContent(queryJson, Encoding.UTF8, "application/json"));
 
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-
-                if (string.IsNullOrEmpty(content))
-                {
-                    PrintResponse(content);
-                }
-
-                var queryResponse = JsonSerializer.Deserialize<QueryResponse>(content, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                if (queryResponse != null)
-                {
-                    Console.WriteLine($"Total Records: {queryResponse.TotalRecords}");
-                    Console.WriteLine($"Count: {queryResponse.Count}");
-                    foreach (var item in queryResponse.Data)
-                    {
-                        Console.WriteLine(JsonSerializer.Serialize(item, new JsonSerializerOptions { WriteIndented = true }));
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Failed to deserialize the response.");
-                }
-            }
-            else
+            if (response.IsSuccessStatusCode == false)
             {
                 Console.WriteLine($"API call failed with status code: {response.StatusCode}");
                 Console.WriteLine(await response.Content.ReadAsStringAsync());
             }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrEmpty(content))
+            {
+                PrintResponse(content);
+            }
+
+            var queryResponse = JsonSerializer.Deserialize<QueryResponse>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (queryResponse is null)
+            {
+                Console.WriteLine("Failed to deserialize the response.");
+                return new List<AzureResource>();
+            }
+                
+            Console.WriteLine($"Total Records: {queryResponse.TotalRecords}");
+            Console.WriteLine($"Count: {queryResponse.Count}");
+
+            return queryResponse.Data;
         }
 
         static void PrintResponse(string content)

@@ -8,7 +8,7 @@ namespace Azure.Rapid.Assessment.CommandLine
 {
     internal class Main
     {
-        ILogger<Main> _logger;
+        static ILogger<Main> _logger;
 
         public Main(ILogger<Main> logger)
         {
@@ -21,10 +21,8 @@ namespace Azure.Rapid.Assessment.CommandLine
         {
             _logger.LogInformation("Starting Azure Rapid Assessment CLI...");
 
-            Console.WriteLine("Starting async method...");
-
             // Check if the 'debug' argument is set
-            Console.WriteLine(
+            _logger.LogTrace(
                 args.Length > 0 && args[0].Equals("debug", StringComparison.OrdinalIgnoreCase)
                     ? "Debugging mode enabled."
                     : "Debugging mode not enabled."
@@ -37,50 +35,28 @@ namespace Azure.Rapid.Assessment.CommandLine
             }
 
             await Run(args);
-            Console.WriteLine("Async method completed!");
+            _logger.LogInformation("Async method completed!");
 
             return 0;
         }
 
         static async Task Run(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            _logger.LogInformation("Hello, World!");
 
-            // Check if the query folder exists
-            if (!Directory.Exists(_queryfolder))
-            {
-                Console.WriteLine($"The query folder '{_queryfolder}' does not exist.");
-                return;
-            }
-
-            // iterate over all files in the query folder and return only files with extension .query, including subdirectories
-            var files = Directory.GetFiles(_queryfolder, "*.query", SearchOption.AllDirectories);
-
-            // Check if there are any files in the query folder
-            if (files.Length == 0)
-            {
-                Console.WriteLine($"The query folder '{_queryfolder}' does not contain any .query files.");
-                return;
-            }
+            List<QueryInfo> queryFiles = await QueryFileHandler.GetAllQueryFilesAsync(new DirectoryInfo(_queryfolder));
 
             // Authenticate using Azure CLI credentials
             var tokenCredential = new AzureCliCredential();
             var testClient = await ResourceGraphService.CreateAsync(tokenCredential);
 
-            foreach (var item in files)
+            foreach (var item in queryFiles)
             {
-                string fileContent = File.ReadAllText(item);
-
-                var q2 = new QueryRequest()
-                {
-                    Query = fileContent,
-                    //Subscriptions = new List<string> { "10d42931-b0b2-4442-badc-311acc7edb2f" }
-                };
-
-                await testClient.PostAsync(q2);
+                var data = await testClient.PostAsync(item);
+                await ParquetHandler.AppendDataAsync(data);
             }
 
-            Console.WriteLine("Finished executing queries.");
+            _logger.LogInformation("Finished executing queries.");
         }
     }
 }
