@@ -1,15 +1,15 @@
 ﻿using Azure.Rapid.Assessment.Core.Model;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Abstractions;
-using Parquet.Meta;
 using System.Text.Json;
 
 namespace Azure.Rapid.Assessment.Core
 {
     public class QueryFileHandler
     {
-        private static readonly ILogger<QueryFileHandler> _logger = HostManager.GetLogger<QueryFileHandler>();
         const string FILE_EXTENTION = ".query";
+        
+        private static readonly ILogger<QueryFileHandler> _logger = LoggerManager.GetLogger<QueryFileHandler>();
+        
         static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -20,24 +20,20 @@ namespace Azure.Rapid.Assessment.Core
         {
             var queryFiles = new List<QueryInfo>();
 
-            // Check if folder exists
             if (!directory.Exists)
             {
                 _logger.LogWarning($"The query folder '{directory.FullName}' does not exist.");
                 return queryFiles;
             }
 
-            // iterate over all files in the query folder and return only files with extension .query, including subdirectories
             var files = Directory.GetFiles(directory.FullName, $"*{FILE_EXTENTION}", SearchOption.AllDirectories);
 
-            // Check if there are any files in the query folder
             if (files.Length == 0)
             {
                 _logger.LogWarning($"The query folder '{directory.FullName}' does not contain any .query files.");
                 return queryFiles;
             }
 
-            // Iterate over all files in the query folder
             foreach (var file in files)
             {
                 var fi = new FileInfo(file);

@@ -6,7 +6,7 @@ namespace Azure.Rapid.Assessment.Core
 {
     public class ParquetHandler
     {
-        private static readonly ILogger<ParquetHandler> _logger = HostManager.GetLogger<ParquetHandler>();
+        private static readonly ILogger<ParquetHandler> _logger = LoggerManager.GetLogger<ParquetHandler>();
 
         private static readonly List<string> EXPECTED_FIELDS = new() { "name", "id", "type", "kind", "subscriptionId", "tenantId" };
 

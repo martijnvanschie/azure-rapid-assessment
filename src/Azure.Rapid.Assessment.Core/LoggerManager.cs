@@ -2,9 +2,9 @@
 
 namespace Azure.Rapid.Assessment.Core
 {
-    public class HostManager
+    public class LoggerManager
     {
-        internal static ILoggerFactory _loggerFactory;
+        internal static ILoggerFactory _loggerFactory = null!;
 
         public static void Initiate(ILoggerFactory loggerFactory)
         {

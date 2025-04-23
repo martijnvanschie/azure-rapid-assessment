@@ -10,7 +10,7 @@ namespace Azure.Rapid.Assessment.Core
 {
     public class ResourceGraphService
     {
-        private static readonly ILogger<ResourceGraphService> _logger = HostManager.GetLogger<ResourceGraphService>();
+        private static readonly ILogger<ResourceGraphService> _logger = LoggerManager.GetLogger<ResourceGraphService>();
 
         private ResourceGraphService() { }
 
@@ -39,7 +39,7 @@ namespace Azure.Rapid.Assessment.Core
             AppUrl = "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2024-04-01";
         }
 
-        public async Task<List<AzureResource>> PostAsync(QueryInfo query)
+        public async Task<List<AzureResource>> ExecuteQueryAsync(QueryInfo query)
         {
             _logger.LogInformation($"Executing query: {query.Title}");
 

@@ -1,5 +1,6 @@
 ﻿using Azure.Rapid.Assessment.CommandLine;
-using Azure.Rapid.Assessment.Core;
+using CoreLib = Azure.Rapid.Assessment.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ builder.Logging.ClearProviders();
 builder.Services.AddSerilog((context, conf) => { conf.ReadFrom.Configuration(builder.Configuration); });
 builder.Services.AddSingleton<Main>();
 
-builder.Services.AddTransient<QueryFileHandler>();
+builder.Services.AddTransient<CoreLib.QueryFileHandler>();
 
 var host = builder.Build();
 
@@ -21,7 +22,10 @@ var service = serviceProvider.GetRequiredService<Main>();
 
 // Register upstream dependencies
 var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-HostManager.Initiate(loggerFactory);
+CoreLib.LoggerManager.Initiate(loggerFactory);
+
+var configuration = host.Services.GetRequiredService<IConfiguration>();
+CoreLib.ConfigurationManager.Initiate(configuration);
 
 var exitCode = await service.StartAsync(args);
 
